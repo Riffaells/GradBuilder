@@ -1,0 +1,15 @@
+{
+  "app_title": "GradBuilder - Diploma Settings",
+  "diploma_title": "Diploma Title:",
+  "author": "Author (Full Name):",
+  "supervisor": "Supervisor:",
+  "year": "Year:",
+  "page_margins": "Page Margins (inches):",
+  "left": "Left:",
+  "right": "Right:",
+  "top": "Top:",
+  "bottom": "Bottom:",
+  "generate": "Generate Diploma",
+  "status_success": "Diploma successfully created and saved to {path}!",
+  "status_error": "Please fill in all required fields!"
+}
