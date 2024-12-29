@@ -11,5 +11,9 @@
   "bottom": "Bottom:",
   "generate": "Generate Diploma",
   "status_success": "Diploma successfully created and saved to {path}!",
-  "status_error": "Please fill in all required fields!"
+  "status_error": "Please fill in all required fields!",
+  "appearance_mode": "Appearance Mode:",
+  "language": "Language:",
+  "generating_diploma": "Generating diploma from Sidebar...",
+  "generate_section": "Generate Diploma"
 }

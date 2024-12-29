@@ -1,11 +1,19 @@
 import customtkinter as ctk
 
+
 class MainFrame(ctk.CTkFrame):
+    """
+    Главная часть приложения с возможностью добавления разделов.
+    """
+
     def __init__(self, master, config, **kwargs):
         super().__init__(master, **kwargs)
         self.config = config
-        self.language_manager = self.config.language_manager
-        self.output_textbox = None
+        self.language_manager = config.language_manager
+
+        # Список разделов
+        self.sections = []
+        self.output_textbox = None  # Ссылка на внешнее текстовое поле
 
         # Заголовок
         self.title_label = ctk.CTkLabel(
@@ -15,45 +23,78 @@ class MainFrame(ctk.CTkFrame):
         )
         self.title_label.pack(pady=10)
 
-        # Поля для ввода
-        self.title_entry = self.create_input(self, "diploma_title")
-        self.author_entry = self.create_input(self, "author")
-        self.supervisor_entry = self.create_input(self, "supervisor")
-        self.year_entry = self.create_input(self, "year", width=100)
-
-        # Параметры страницы (отступы)
-        self.margins_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.margins_frame.pack(pady=10)
-        self.margins_label = ctk.CTkLabel(
-            self.margins_frame, text=self.language_manager.get("page_margins"), font=ctk.CTkFont(size=14)
+        # Текстовое поле для ввода раздела
+        self.section_entry = ctk.CTkEntry(
+            self,
+            placeholder_text=self.language_manager.get("enter_section"),
+            width=400
         )
-        self.margins_label.pack(pady=5)
-        self.margin_left = self.create_margin_input(self.margins_frame, "left", default=1.0)
-        self.margin_right = self.create_margin_input(self.margins_frame, "right", default=1.0)
-        self.margin_top = self.create_margin_input(self.margins_frame, "top", default=1.0)
-        self.margin_bottom = self.create_margin_input(self.margins_frame, "bottom", default=1.0)
+        self.section_entry.pack(pady=(5, 10))
+
+        # Кнопка "Добавить раздел"
+        self.add_section_button = ctk.CTkButton(
+            self,
+            text=self.language_manager.get("add_section"),
+            command=self.add_section
+        )
+        self.add_section_button.pack(pady=(5, 10))
+
+        # Список добавленных разделов
+        self.sections_listbox = ctk.CTkTextbox(self, height=150, width=400)
+        self.sections_listbox.pack(pady=(10, 10))
+
+        # Кнопки "Удалить последний раздел" и "Очистить все разделы"
+        self.clear_buttons_frame = ctk.CTkFrame(self)
+        self.clear_buttons_frame.pack(pady=(10, 10))
+
+        self.remove_last_button = ctk.CTkButton(
+            self.clear_buttons_frame,
+            text=self.language_manager.get("remove_last"),
+            command=self.remove_last_section
+        )
+        self.remove_last_button.grid(row=0, column=0, padx=(5, 10))
+
+        self.clear_all_button = ctk.CTkButton(
+            self.clear_buttons_frame,
+            text=self.language_manager.get("clear_all"),
+            command=self.clear_all_sections
+        )
+        self.clear_all_button.grid(row=0, column=1, padx=(10, 5))
 
     def set_output_textbox(self, textbox):
-        """Получаем ссылку на textbox, чтобы выводить туда информацию."""
+        """Устанавливает внешнее текстовое поле для вывода."""
         self.output_textbox = textbox
 
-    def create_input(self, parent, label_key, width=400):
-        """Создание текстового поля с меткой."""
-        frame = ctk.CTkFrame(parent, corner_radius=10)
-        frame.pack(pady=5, fill="x", padx=20)
-        label = ctk.CTkLabel(frame, text=self.language_manager.get(label_key), font=("Arial", 14))
-        label.pack(side="left", padx=10)
-        entry = ctk.CTkEntry(frame, width=width)
-        entry.pack(side="right", padx=10)
-        return entry
+    def add_section(self):
+        """Добавляет новый раздел в список."""
+        section = self.section_entry.get().strip()
+        if section:
+            self.sections.append(section)
+            self.update_sections_listbox()
+            self.section_entry.delete(0, "end")
+            self.update_output_textbox(f"Section added: {section}")
 
-    def create_margin_input(self, parent, label_key, default):
-        """Создание поля для ввода отступов."""
-        frame = ctk.CTkFrame(parent, corner_radius=10)
-        frame.pack(pady=5, fill="x", padx=20)
-        label = ctk.CTkLabel(frame, text=self.language_manager.get(label_key), font=("Arial", 14))
-        label.pack(side="left", padx=10)
-        entry = ctk.CTkEntry(frame, width=100)
-        entry.insert(0, str(default))
-        entry.pack(side="right", padx=10)
-        return entry
+    def remove_last_section(self):
+        """Удаляет последний раздел из списка."""
+        if self.sections:
+            removed = self.sections.pop()
+            self.update_sections_listbox()
+            self.update_output_textbox(f"Section removed: {removed}")
+
+    def clear_all_sections(self):
+        """Очищает все разделы."""
+        self.sections = []
+        self.update_sections_listbox()
+        self.update_output_textbox("All sections cleared.")
+
+    def update_sections_listbox(self):
+        """Обновляет отображение списка разделов."""
+        self.sections_listbox.delete("0.0", "end")
+        for i, section in enumerate(self.sections, 1):
+            self.sections_listbox.insert("end", f"{i}. {section}\n")
+
+    def update_output_textbox(self, message):
+        """Выводит сообщение во внешнее текстовое поле."""
+        if self.output_textbox:
+            self.output_textbox.insert("end", message + "\n")
+            self.output_textbox.see("end")
